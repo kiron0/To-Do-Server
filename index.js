@@ -165,7 +165,7 @@ async function run() {
         };
         const result = await toDoSCollection.updateOne(query, updateDoc);
         if (result.acknowledged) {
-          res.send({ success: true, message: "ToDo Completed" });
+          res.send({ success: true, message: "ToDo is Completed" });
         }
       } else {
         res.status(403).send({ success: false, message: "Forbidden Access." });
