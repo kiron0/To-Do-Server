@@ -51,11 +51,6 @@ async function run() {
       }
     };
 
-    app.get("/tasks", verifyJWT, async (req, res) => {
-      const tasks = await toDoSCollection.find({}).toArray();
-      res.send(tasks);
-    });
-
     app.get("/users", async (req, res) => {
       const uid = req.query.uid;
       if (uid) {
@@ -116,7 +111,40 @@ async function run() {
       res.send(result);
     });
 
+    // admin routes
+
+    app.get("/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = await usersCollection.findOne({ email: email });
+      const isAdmin = user?.role === "admin";
+      res.send({ admin: isAdmin });
+    });
+
+    app.put("/user/admin/", verifyJWT, verifyAdmin, async (req, res) => {
+      const email = req.body.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { role: "admin" },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    app.put("/user/removeAdmin/", verifyJWT, verifyAdmin, async (req, res) => {
+      const email = req.body.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { role: "user" },
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     // task post
+    app.get("/toDoS", verifyJWT, async (req, res) => {
+      const toDoS = await toDoSCollection.find({}).toArray();
+      res.send(toDoS);
+    });
+
     app.post("/createToDo", verifyJWT, async (req, res) => {
       const data = req.body;
       const decodedId = req.decoded.uid;
@@ -149,6 +177,21 @@ async function run() {
             message: "ToDo Deleted successfully",
           });
         }
+      } else {
+        res.status(403).send({ success: false, message: "Forbidden Access." });
+      }
+    });
+
+    app.delete("/todoS/:id", verifyJWT, verifyAdmin, async (req, res) => {
+      const todoId = req.params.id;
+      const result = await toDoSCollection.deleteOne({
+        _id: ObjectId(todoId),
+      });
+      if (result.acknowledged) {
+        res.send({
+          success: true,
+          message: "ToDo Deleted successfully",
+        });
       } else {
         res.status(403).send({ success: false, message: "Forbidden Access." });
       }
