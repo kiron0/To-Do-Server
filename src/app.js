@@ -14,6 +14,7 @@ app.use(express.json());
 /* here will be all the imports routes */
 const usersRoute = require("./routes/v1/usersRoute");
 const toDosRoute = require("./routes/v1/toDosRoute");
+const appRoute = require("./routes/v1/appRoutes");
 
 /* here will be the all the routes */
 app.get("/", (req, res) => {
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 /* Here is the User Routes */
 app.use("/api/v1/", usersRoute);
 app.use("/api/v1/", toDosRoute);
+app.use("/api/v1/", appRoute);
 
 /* not found routes */
 app.use((req, res, next) => {
