@@ -1,9 +1,10 @@
-const { ObjectId } = require("mongodb");
-const jwt = require("jsonwebtoken");
-const dbConnect = require("../utils/dbConnect");
-const usersCollection = dbConnect.db("kTaskToDo").collection("users");
+import { Request, Response } from "express";
+import { ObjectId } from "mongodb";
+import jwt from "jsonwebtoken";
+import client from "../utils/dbCollection";
+const usersCollection = client.db("kTaskToDo").collection("users" as string);
 
-const getUsers = async (req, res) => {
+export const getUsers = async (req: Request, res: Response) => {
   const uid = req.query.uid;
   if (uid) {
     const users = await usersCollection.find({ uid: uid }).toArray();
@@ -13,27 +14,26 @@ const getUsers = async (req, res) => {
   }
 };
 
-const getUserById = async (req, res) => {
+export const getUserById = async (req: Request, res: Response) => {
   const uid = req.query.uid;
   const id = req.params.id;
   if (uid) {
-    const user = await usersCollection.findOne({ _id: ObjectId(id) });
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
     res.send(user);
   } else {
     res.status(403).send({ message: "forbidden access" });
   }
 };
 
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req: Request, res: Response) => {
   const users = await usersCollection.find({}).toArray();
   res.send(users);
 };
 
-// update user data using patch
-const updateUser = async (req, res) => {
+export const updateUser = async (req: Request, res: Response) => {
   const data = req.body;
-  const uid = req.query.uid;
-  const decodedID = req.decoded.uid;
+  const uid = req.query.uid as string;
+  const decodedID = req?.body?.user?.uid;
   const query = { uid: uid };
   const updateDoc = {
     $set: data,
@@ -48,7 +48,7 @@ const updateUser = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
+export const createUser = async (req: Request, res: Response) => {
   const user = req.body;
   const filter = { email: user.email, uid: user.uid };
   const options = { upsert: true };
@@ -58,26 +58,26 @@ const createUser = async (req, res) => {
   const result = await usersCollection.updateOne(filter, updateDoc, options);
   const token = jwt.sign(
     { email: user.email, uid: user.uid },
-    process.env.ACCESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET as string,
     { expiresIn: "7d" }
   );
   res.send({ result, token });
 };
 
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req: Request, res: Response) => {
   const email = req.params.email;
   const result = await usersCollection.deleteOne({ email: email });
   res.send(result);
 };
 
-const findAdmin = async (req, res) => {
+export const findAdmin = async (req: Request, res: Response) => {
   const email = req.params.email;
   const user = await usersCollection.findOne({ email: email });
   const isAdmin = user?.role === "admin";
   res.send({ admin: isAdmin });
 };
 
-const makeAdmin = async (req, res) => {
+export const makeAdmin = async (req: Request, res: Response) => {
   const email = req.body.email;
   const filter = { email: email };
   const updateDoc = {
@@ -87,7 +87,7 @@ const makeAdmin = async (req, res) => {
   res.send(result);
 };
 
-const removeAdmin = async (req, res) => {
+export const removeAdmin = async (req: Request, res: Response) => {
   const email = req.body.email;
   const filter = { email: email };
   const updateDoc = {
@@ -95,15 +95,4 @@ const removeAdmin = async (req, res) => {
   };
   const result = await usersCollection.updateOne(filter, updateDoc);
   res.send(result);
-};
-
-module.exports = {
-  getUsers,
-  getAllUsers,
-  updateUser,
-  createUser,
-  deleteUser,
-  findAdmin,
-  makeAdmin,
-  removeAdmin,
 };

@@ -1,15 +1,16 @@
-const dbConnect = require("../utils/dbConnect");
-const { ObjectId } = require("mongodb");
-const toDosCollection = dbConnect.db("kTaskToDo").collection("tasks");
+import { Request, Response } from "express";
+import client from "../utils/dbCollection";
+import { ObjectId } from "mongodb";
+const toDosCollection = client.db("kTaskToDo").collection("tasks");
 
-const getAllToDos = async (req, res) => {
+export const getAllToDos = async (req: Request, res: Response) => {
   const toDos = await toDosCollection.find({}).toArray();
   res.send(toDos);
 };
 
-const createToDo = async (req, res) => {
+export const createToDo = async (req: Request, res: Response) => {
   const data = req.body;
-  const decodedId = req.decoded.uid;
+  const decodedId = req?.body?.user?.uid;
   const uid = req.query.uid;
   if (uid === decodedId) {
     const result = await toDosCollection.insertOne(data);
@@ -24,13 +25,13 @@ const createToDo = async (req, res) => {
   }
 };
 
-const deleteToDo = async (req, res) => {
+export const deleteToDo = async (req: Request, res: Response) => {
   const todoId = req.query.todoId;
-  const decodedId = req.decoded.uid;
+  const decodedId = req?.body?.user?.uid;
   const uid = req.query.uid;
   if (decodedId === uid) {
     const result = await toDosCollection.deleteOne({
-      _id: ObjectId(todoId),
+      _id: new ObjectId(todoId as string),
     });
     if (result.acknowledged) {
       res.send({
@@ -43,10 +44,10 @@ const deleteToDo = async (req, res) => {
   }
 };
 
-const deleteToDoAdmin = async (req, res) => {
+export const deleteToDoAdmin = async (req: Request, res: Response) => {
   const todoId = req.params.id;
   const result = await toDosCollection.deleteOne({
-    _id: ObjectId(todoId),
+    _id: new ObjectId(todoId as string),
   });
   if (result.acknowledged) {
     res.send({
@@ -58,12 +59,12 @@ const deleteToDoAdmin = async (req, res) => {
   }
 };
 
-const completeToDo = async (req, res) => {
-  const decodedId = req.decoded.uid;
+export const completeToDo = async (req: Request, res: Response) => {
+  const decodedId = req?.body?.user?.uid;
   const uid = req.query.uid;
   const todoId = req.query.todoId;
   if (decodedId === uid) {
-    const query = { _id: ObjectId(todoId) };
+    const query = { _id: new ObjectId(todoId as string), };
     const updateDoc = {
       $set: { completed: true },
     };
@@ -76,8 +77,8 @@ const completeToDo = async (req, res) => {
   }
 };
 
-const getMyToDos = async (req, res) => {
-  const decodedEmail = req.decoded.email;
+export const getMyToDos = async (req: Request, res: Response) => {
+  const decodedEmail = req?.body?.user?.email;
   const email = req.query.email;
   if (email === decodedEmail) {
     const myItems = await toDosCollection.find({ email: email }).toArray();
@@ -87,8 +88,8 @@ const getMyToDos = async (req, res) => {
   }
 };
 
-const getMyCompletedToDos = async (req, res) => {
-  const decodedEmail = req.decoded.email;
+export const getMyCompletedToDos = async (req: Request, res: Response) => {
+  const decodedEmail = req?.body?.user?.email;
   const email = req.query.email;
   if (email === decodedEmail) {
     const myItems = await toDosCollection
@@ -100,10 +101,10 @@ const getMyCompletedToDos = async (req, res) => {
   }
 };
 
-const updateToDo = async (req, res) => {
+export const updateToDo = async (req: Request, res: Response) => {
   const id = req.params.id;
   const body = req.body;
-  const filter = { _id: ObjectId(id) };
+  const filter = { _id: new ObjectId(id as string), };
   const options = { upsert: true };
   const updatedDoc = {
     $set: body,
@@ -114,15 +115,4 @@ const updateToDo = async (req, res) => {
     options
   );
   res.send(toDoUpdated);
-};
-
-module.exports = {
-  getAllToDos,
-  createToDo,
-  deleteToDo,
-  deleteToDoAdmin,
-  completeToDo,
-  getMyToDos,
-  getMyCompletedToDos,
-  updateToDo,
 };

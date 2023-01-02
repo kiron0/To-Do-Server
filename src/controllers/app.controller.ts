@@ -1,19 +1,20 @@
-const { ObjectId } = require("mongodb");
-const client = require("../utils/dbConnect");
+import { Request, Response } from "express";
+import { ObjectId } from "mongodb";
+import client from "../utils/dbCollection";
 const appNameCollection = client.db("kTaskToDo").collection("appName");
 
-const getAppName = async (req, res) => {
+export const getAppName = async (req: Request, res: Response) => {
   const appID = {
-    _id: ObjectId("637be03206a8ad9fabc39e44"),
+    _id: new ObjectId("637be03206a8ad9fabc39e44"),
   };
   const appName = await appNameCollection.findOne(appID);
   res.send(appName);
 };
 
-const updateAppName = async (req, res) => {
+export const updateAppName = async (req: Request, res: Response) => {
   const name = req.body;
   const appID = {
-    _id: ObjectId("637be03206a8ad9fabc39e44"),
+    _id: new ObjectId("637be03206a8ad9fabc39e44"),
   };
   const updateDoc = {
     $set: name,
@@ -23,5 +24,3 @@ const updateAppName = async (req, res) => {
     res.send({ success: true, message: "Update app name successfully" });
   }
 };
-
-module.exports = { getAppName, updateAppName };
