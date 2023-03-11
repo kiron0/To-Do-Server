@@ -7,6 +7,7 @@ import {
   deleteToDoAdmin,
   completeToDo,
   getMyToDos,
+  getMyToDosByTitle,
   getMyCompletedToDos,
   updateToDo,
 } from "../../controllers/toDos.controller";
@@ -19,6 +20,7 @@ router.delete("/toDoS", VerifyToken, deleteToDo);
 router.delete("/todoS/:id", VerifyToken, VerifyAdmin, deleteToDoAdmin);
 router.patch("/toDoS", VerifyToken, completeToDo);
 router.get("/myToDos", VerifyToken, getMyToDos);
+router.get("/myToDoS/search", VerifyToken, getMyToDosByTitle);
 router.get("/myToDoS/completed", VerifyToken, getMyCompletedToDos);
 router.patch("/toDos/updateToDoS/:id", VerifyToken, updateToDo);
 

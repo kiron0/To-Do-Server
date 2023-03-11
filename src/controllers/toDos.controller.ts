@@ -88,6 +88,23 @@ export const getMyToDos = async (req: Request, res: Response) => {
   }
 };
 
+export const getMyToDosByTitle = async (req: Request, res: Response) => {
+  const email = req.query.email;
+  const title = req.query.title;
+  const result = await toDosCollection.find({}).toArray();
+  const searchedResult = result.filter(
+    (item) =>
+      item.email === email &&
+      item.title.toLowerCase() === (title as string).toLowerCase()
+  );
+  // get the first part from the title without slice
+  if (searchedResult.length > 0) {
+    res.status(200).send({ success: true, message: "Searched Result Found", result: searchedResult[0] });
+  } else {
+    res.status(200).send({ success: false, message: "No result found" })
+  }
+};
+
 export const getMyCompletedToDos = async (req: Request, res: Response) => {
   const decodedEmail = req?.body?.user?.email;
   const email = req.query.email;
