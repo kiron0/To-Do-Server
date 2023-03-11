@@ -59,7 +59,7 @@ export const createUser = async (req: Request, res: Response) => {
   const token = jwt.sign(
     { email: user.email, uid: user.uid },
     process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: "7d" }
+    { expiresIn: "15d" }
   );
   res.send({ result, token });
 };
@@ -91,7 +91,7 @@ export const removeAdmin = async (req: Request, res: Response) => {
   const email = req.body.email;
   const filter = { email: email };
   const updateDoc = {
-    $set: { role: "" },
+    $unset: { role: "" },
   };
   const result = await usersCollection.updateOne(filter, updateDoc);
   res.send(result);
