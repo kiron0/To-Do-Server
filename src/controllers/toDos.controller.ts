@@ -147,7 +147,7 @@ export const filteredToDos = async (req: Request, res: Response) => {
       result: filteredToDos,
     });
   } else if (filter === "pending") {
-    const filteredToDos = myItems.filter((item) => item.completed === false);
+    const filteredToDos = myItems.filter((item) => item.completed === false || item.completed === undefined);
     res.send({
       success: true,
       message: "All ToDos",
