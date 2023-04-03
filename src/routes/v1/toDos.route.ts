@@ -9,6 +9,7 @@ import {
   getMyToDosByTitle,
   getMyCompletedToDos,
   updateToDo,
+  filteredToDos,
 } from "../../controllers/toDos.controller";
 import { VerifyAdmin } from "../../middlewares/VerifyAdmin";
 import { VerifyToken } from "../../middlewares/VerifyToken";
@@ -18,6 +19,7 @@ router.post("/createToDo", VerifyToken, createToDo);
 router.delete("/toDoS", VerifyToken, deleteToDo);
 router.patch("/toDoS", VerifyToken, completeToDo);
 router.get("/myToDos", VerifyToken, getMyToDos);
+router.get("/myToDos/filtered", VerifyToken, filteredToDos);
 router.get("/myToDoS/search", VerifyToken, getMyToDosByTitle);
 router.get("/myToDoS/completed", VerifyToken, getMyCompletedToDos);
 router.patch("/toDos/updateToDoS", VerifyToken, updateToDo);

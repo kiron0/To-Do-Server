@@ -124,3 +124,36 @@ export const updateToDo = async (req: Request, res: Response) => {
     res.status(403).send({ success: false, message: "Forbidden Access." });
   }
 };
+
+export const filteredToDos = async (req: Request, res: Response) => {
+  const email = req.query.email;
+  const filter = req.query.filter;
+  const myItems = await toDosCollection.find({ email: email }).toArray();
+  if (filter === "completed") {
+    const filteredToDos = myItems.filter((item) => item.completed === true);
+    res.send({
+      success: true,
+      message: "All ToDos",
+      result: filteredToDos,
+    });
+  } else if (filter === "pending") {
+    const filteredToDos = myItems.filter((item) => item.completed === false);
+    res.send({
+      success: true,
+      message: "All ToDos",
+      result: filteredToDos,
+    });
+  } else if (filter === "all") {
+    res.send({
+      success: true,
+      message: "All ToDos",
+      result: myItems,
+    });
+  } else {
+    res.send({
+      success: true,
+      message: "All ToDos",
+      result: myItems,
+    });
+  }
+}
