@@ -73,6 +73,16 @@ export const getMyToDos = async (req: Request, res: Response) => {
   }
 };
 
+export const getToDoSbyEmail = async (req: Request, res: Response) => {
+  const email = req.query.email;
+  if (email) {
+    const myItems = await toDosCollection.find({ email: email }).toArray();
+    res.send({ success: true, message: `ToDoS Found for ${email}`, result: myItems });
+  } else {
+    res.status(403).send({ message: "forbidden access" });
+  }
+};
+
 export const getMyToDosByTitle = async (req: Request, res: Response) => {
   const email = req.query.email;
   const title = req.query.title;

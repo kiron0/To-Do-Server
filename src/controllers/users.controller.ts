@@ -96,3 +96,13 @@ export const removeAdmin = async (req: Request, res: Response) => {
   const result = await usersCollection.updateOne(filter, updateDoc);
   res.send(result);
 };
+
+// get only gmail users
+export const getGmailUsers = async (req: Request, res: Response) => {
+  const users = await usersCollection.find({ email: { $regex: /@/ } }).toArray();
+  if (users.length > 0) {
+    res.send({ success: true, message: "Get gmail users successfully", result: users });
+  } else {
+    res.send({ success: false, message: "No gmail users found" });
+  }
+};
