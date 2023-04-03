@@ -8,7 +8,7 @@ export const getAppName = async (req: Request, res: Response) => {
     _id: new ObjectId("637be03206a8ad9fabc39e44"),
   };
   const appName = await appNameCollection.findOne(appID);
-  res.send(appName);
+  res.send({ success: true, message: "App Name", result: appName });
 };
 
 export const updateAppName = async (req: Request, res: Response) => {

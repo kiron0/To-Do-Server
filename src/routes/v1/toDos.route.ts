@@ -4,7 +4,6 @@ import {
   getAllToDos,
   createToDo,
   deleteToDo,
-  deleteToDoAdmin,
   completeToDo,
   getMyToDos,
   getMyToDosByTitle,
@@ -14,14 +13,13 @@ import {
 import { VerifyAdmin } from "../../middlewares/VerifyAdmin";
 import { VerifyToken } from "../../middlewares/VerifyToken";
 
-router.get("/toDos", getAllToDos);
+router.get("/toDos", VerifyToken, VerifyAdmin, getAllToDos);
 router.post("/createToDo", VerifyToken, createToDo);
 router.delete("/toDoS", VerifyToken, deleteToDo);
-router.delete("/todoS/:id", VerifyToken, VerifyAdmin, deleteToDoAdmin);
 router.patch("/toDoS", VerifyToken, completeToDo);
 router.get("/myToDos", VerifyToken, getMyToDos);
 router.get("/myToDoS/search", VerifyToken, getMyToDosByTitle);
 router.get("/myToDoS/completed", VerifyToken, getMyCompletedToDos);
-router.patch("/toDos/updateToDoS/:id", VerifyToken, updateToDo);
+router.patch("/toDos/updateToDoS", VerifyToken, updateToDo);
 
 export default router;
