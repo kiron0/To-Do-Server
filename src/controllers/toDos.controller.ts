@@ -64,10 +64,16 @@ export const completeToDo = async (req: Request, res: Response) => {
 
 export const getMyToDos = async (req: Request, res: Response) => {
   const decodedEmail = req?.body?.user?.email;
-  const email = req.query.email;
+  let { email, page, limit } = req.query as any;
+  page = parseInt(page);
+  limit = parseInt(limit);
+  if (!page) page = 1;
+  if (!limit) limit = 10;
+  const skip = (page - 1) * limit;
   if (email === decodedEmail) {
-    const myItems = await toDosCollection.find({ email: email }).toArray();
-    res.send(myItems);
+    const myItems = await toDosCollection.find({ email: email }).sort({ _id: -1 }).skip(skip).limit(limit).toArray();
+    const pages = Math.ceil((await toDosCollection.countDocuments({ email: email })) / limit);
+    res.send({ success: true, pages: pages, toDos: myItems });
   } else {
     res.status(403).send({ message: "forbidden access" });
   }

@@ -26,8 +26,16 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const getAllUsers = async (req: Request, res: Response) => {
-  const users = await usersCollection.find({}).toArray();
-  res.send(users);
+  let { page, limit } = req.query as any;
+  page = parseInt(page);
+  limit = parseInt(limit);
+  if (!page) page = 1;
+  if (!limit) limit = 10;
+  const skip = (page - 1) * limit;
+  const users = await usersCollection.find({}).skip(skip).limit(limit).toArray();
+  const pages = Math.ceil((await usersCollection.countDocuments({})) / limit);
+  const totalUsers = await usersCollection.countDocuments({});
+  res.send({ success: true, pages: pages, users: users, totalUsers: totalUsers });
 };
 
 export const updateUser = async (req: Request, res: Response) => {
